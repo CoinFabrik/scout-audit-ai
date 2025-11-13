@@ -1,0 +1,8 @@
+{
+  "title": "Input validation checks",
+  "checks": [
+    "Look for unchecked arithmetic when converting token amounts.",
+    "Ensure every external instruction validates signer permissions.",
+    "Verify cross-program invocations sanitize accounts provided by callers."
+  ]
+}

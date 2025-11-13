@@ -1,0 +1,6 @@
+{
+  "contract_type": "lending",
+  "files": [
+    "contracts/swap.rs"
+  ]
+}
