@@ -10,6 +10,21 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### Environment Setup
+
+For LLM API access, set up your environment variables:
+
+```bash
+# Load environment variables from .env file
+source .envrc
+
+# Or manually set:
+export OPENAI_API_KEY="your-api-key-here"
+export SCOUT_AI_MODEL="gpt-4"  # optional, defaults to gpt-5
+```
+
+The `.envrc` script automatically loads variables from a `.env` file (which is gitignored for security).
+
 Usage mirrors the requested interface:
 
 ```bash
