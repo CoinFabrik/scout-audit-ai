@@ -40,6 +40,20 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Skip the LLM call and only print the composed prompt.",
     )
+    parser.add_argument(
+        "--include-deps",
+        action="store_true",
+        help="Scan listed files for local module dependencies and include them.",
+    )
+    parser.add_argument(
+        "--dependency-depth",
+        type=int,
+        default=1,
+        help=(
+            "Maximum dependency depth when --include-deps is active (default: 1). "
+            "Ignored unless --include-deps is provided."
+        ),
+    )
     return parser.parse_args(argv)
 
 

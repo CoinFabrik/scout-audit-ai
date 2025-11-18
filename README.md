@@ -20,7 +20,18 @@ Usage mirrors the requested interface:
 
 The CLI automatically looks for a file named `.scout` inside the target directory. Pass `--config <path>` only when you need to point discovery at a different directory (or at an explicit `.scout` file).
 
+Pass `--include-deps` to inspect each listed Rust file for local `mod foo;` declarations and any `use` paths (e.g., `use crate::foo::bar`) so that referenced modules are automatically added to the prompt. Control recursion with `--dependency-depth` (default `1`), which is ignored unless dependencies are enabled. Installing `tree_sitter` and `tree_sitter_languages` (added to `requirements.txt`) is required for this flag.
+
 Remove `--dry-run` and set `OPENAI_API_KEY` once you are ready to hit your provider (the CLI uses `langchain-openai`'s `ChatOpenAI` under the hood). Define `SCOUT_AI_MODEL` to override the default model name (defaults to `gpt-5`).
+
+For a richer dependency graph demo, run the complex example:
+
+```bash
+./scout-ai-poc examples/complex \
+  --dry-run \
+  --include-deps \
+  --dependency-depth 2
+```
 
 ## Project layout
 
@@ -32,6 +43,7 @@ Remove `--dry-run` and set `OPENAI_API_KEY` once you are ready to hit your provi
 - `prompts/base_prompt.txt` – primary template; edit this file to adjust model instructions.
 - `prompts/input_validation.json` – example extra prompt payload wired via `--extraPrompt`.
 - `examples/.scout` – demo configuration pointing at `contracts/swap.rs`.
+- `examples/complex/.scout` – dependency-heavy sample centered on `contracts/gateway.rs`.
 - `scout-ai-poc` – thin wrapper so you can run `scout-ai-poc …` locally.
 
 ## .scout file format
