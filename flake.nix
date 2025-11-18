@@ -28,6 +28,7 @@
             python313
             python313Packages.langchain
             python313Packages.langchain-openai
+            python313Packages.langchain-anthropic
           ];
         };
       }
