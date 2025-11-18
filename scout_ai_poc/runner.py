@@ -15,7 +15,6 @@ from langchain_core.prompts import (
     SystemMessagePromptTemplate,
 )
 from langchain_core.runnables import RunnableSequence
-from langchain_openai import ChatOpenAI
 
 from .data_loader import (
     build_files_context,
@@ -53,9 +52,21 @@ def build_prompt(prompt_text: str) -> ChatPromptTemplate:
     )
 
 
-def create_chain(prompt: ChatPromptTemplate, model_name: str, provider: str) -> RunnableSequence:
-    logger.info("Creating LangChain pipeline with provider '%s' and model '%s'.", provider, model_name)
+def create_chain(
+    prompt: ChatPromptTemplate, model_name: str, provider: str
+) -> RunnableSequence:
+    logger.info(
+        "Creating LangChain pipeline with provider '%s' and model '%s'.",
+        provider,
+        model_name,
+    )
     if provider == "openai":
+        try:
+            from langchain_openai import ChatOpenAI
+        except ImportError:
+            raise ImportError(
+                "langchain_openai is not installed. Install it with: pip install langchain-openai"
+            )
         llm = ChatOpenAI(
             model=model_name,
             temperature=1,
@@ -65,11 +76,10 @@ def create_chain(prompt: ChatPromptTemplate, model_name: str, provider: str) -> 
         try:
             from langchain_anthropic import ChatAnthropic
         except ImportError:
-            raise ImportError("langchain_anthropic is not installed. Install it with: pip install langchain-anthropic")
-        llm = ChatAnthropic(
-            model=model_name,
-            temperature=1,
-        )
+            raise ImportError(
+                "langchain_anthropic is not installed. Install it with: pip install langchain-anthropic"
+            )
+        llm = ChatAnthropic(model=model_name, temperature=1)
     else:
         raise ValueError(f"Unsupported provider: {provider}")
     return prompt | llm | StrOutputParser()
@@ -172,7 +182,9 @@ def run_analysis(args) -> int:
 
     if not should_execute_llm(args.dry_run, args.provider):
         logger.info("Rendering composed prompt without executing the LLM.")
-        api_key_name = "OPENAI_API_KEY" if args.provider == "openai" else "ANTHROPIC_API_KEY"
+        api_key_name = (
+            "OPENAI_API_KEY" if args.provider == "openai" else "ANTHROPIC_API_KEY"
+        )
         print(
             f"[DRY-RUN] Displaying composed prompt. Provide {api_key_name} to execute.\n"
         )
