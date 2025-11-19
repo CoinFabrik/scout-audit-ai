@@ -28,12 +28,18 @@ from .vulnerability_catalog import get_vulnerabilities
 CONFIG_FILENAME = ".scout"
 logger = logging.getLogger(__name__)
 
+PROVIDER_TO_ENV = {
+    "openai": "OPENAI_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "gemini": "GEMINI_API_KEY",
+}
+
 
 def should_execute_llm(explicit_dry_run: bool, provider: str) -> bool:
     if explicit_dry_run:
         logger.info("Dry-run flag active; LLM execution disabled.")
         return False
-    api_key_env = "OPENAI_API_KEY" if provider == "openai" else "ANTHROPIC_API_KEY"
+    api_key_env = PROVIDER_TO_ENV[provider]
     has_key = bool(os.getenv(api_key_env))
     if not has_key:
         logger.warning(f"{api_key_env} not set; defaulting to dry-run output.")
@@ -60,28 +66,37 @@ def create_chain(
         provider,
         model_name,
     )
-    if provider == "openai":
-        try:
-            from langchain_openai import ChatOpenAI
-        except ImportError:
-            raise ImportError(
-                "langchain_openai is not installed. Install it with: pip install langchain-openai"
+    match provider:
+        case "openai":
+            try:
+                from langchain_openai import ChatOpenAI
+            except ImportError:
+                raise ImportError(
+                    "langchain_openai is not installed. Install it with: pip install langchain-openai"
+                )
+            llm = ChatOpenAI(
+                model=model_name,
+                temperature=1,
+                model_kwargs={"reasoning_effort": "high"},
             )
-        llm = ChatOpenAI(
-            model=model_name,
-            temperature=1,
-            model_kwargs={"reasoning_effort": "high"},
-        )
-    elif provider == "anthropic":
-        try:
-            from langchain_anthropic import ChatAnthropic
-        except ImportError:
-            raise ImportError(
-                "langchain_anthropic is not installed. Install it with: pip install langchain-anthropic"
-            )
-        llm = ChatAnthropic(model=model_name, temperature=1)
-    else:
-        raise ValueError(f"Unsupported provider: {provider}")
+        case "anthropic":
+            try:
+                from langchain_anthropic import ChatAnthropic
+            except ImportError:
+                raise ImportError(
+                    "langchain_anthropic is not installed. Install it with: pip install langchain-anthropic"
+                )
+            llm = ChatAnthropic(model=model_name, temperature=1)
+        case "gemini":
+            try:
+                from langchain_google_genai import ChatGoogleGenerativeAI
+            except ImportError:
+                raise ImportError(
+                    "langchain_google_genai is not installed. Install it with: pip install langchain-google-genai"
+                )
+            llm = ChatGoogleGenerativeAI(model=model_name, temperature=1)
+        case _:
+            raise ValueError(f"Unsupported provider: {provider}")
     return prompt | llm | StrOutputParser()
 
 
