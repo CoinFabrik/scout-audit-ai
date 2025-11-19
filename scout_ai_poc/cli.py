@@ -31,9 +31,15 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
         help="Optional JSON/text file with additional instructions for the LLM.",
     )
     parser.add_argument(
+        "--provider",
+        choices=["openai", "anthropic"],
+        default=os.getenv("SCOUT_AI_PROVIDER", "openai"),
+        help="AI provider to use (default: SCOUT_AI_PROVIDER or openai).",
+    )
+    parser.add_argument(
         "--model",
         default=os.getenv("SCOUT_AI_MODEL", "gpt-5"),
-        help="Model name passed to LangChain (default: SCOUT_AI_MODEL or gpt-5).",
+        help="Model name passed to LangChain (default: SCOUT_AI_MODEL or gpt-5 for openai, claude-sonnet-4-5-20250929 for anthropic).",
     )
     parser.add_argument(
         "--dry-run",

@@ -1,0 +1,10 @@
+
+{
+  "title": "Mathematical & Accounting Errors",
+  "checks": [
+    "Scrutinize all arithmetic involving division to ensure multiplication is performed before division to minimize precision loss (e.g., use `(a * b) / c` instead of `a * (b / c)`).",
+    "Check all arithmetic operations for potential integer overflows and underflows, especially with token amounts and loop counters. Confirm `SafeMath` or equivalent checks are used where necessary.",
+    "Analyze formulas for calculating shares from deposits (e.g., `shares = (deposit * total_shares) / total_assets`). Investigate if an attacker can manipulate the formula by making `total_assets` very large relative to `total_shares`, causing subsequent deposits to receive zero shares due to rounding.",
+    "Look for 'first deposit' vulnerabilities where an attacker can deposit a minimal amount (e.g., 1 wei), then artificially inflate the pool's assets by direct transfer, hijacking the share price."
+  ]
+}

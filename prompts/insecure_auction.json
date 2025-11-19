@@ -1,0 +1,10 @@
+
+{
+  "title": "Insecure Auction Mechanics",
+  "checks": [
+    "When a value is calculated from a user-provided list of assets, verify that the code explicitly checks for and rejects duplicate assets to prevent artificial value inflation.",
+    "Analyze the time between auction creation and settlement for potential race conditions where underlying asset prices or collateral values can change, leading to unfair pricing.",
+    "Ensure there is a robust mechanism to clean up and finalize auctions that are completed, cancelled, or expired, preventing them from becoming permanently stuck.",
+    "Verify that bids cannot be placed on an auction with invalid or outdated parameters."
+  ]
+}
