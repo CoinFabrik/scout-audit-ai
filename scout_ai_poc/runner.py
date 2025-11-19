@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 PROVIDER_TO_ENV = {
     "openai": "OPENAI_API_KEY",
     "anthropic": "ANTHROPIC_API_KEY",
-    "gemini": "GEMINI_API_KEY",
+    "gemini": "GOOGLE_API_KEY",
 }
 
 
