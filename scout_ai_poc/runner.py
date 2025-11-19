@@ -15,7 +15,6 @@ from langchain_core.prompts import (
     SystemMessagePromptTemplate,
 )
 from langchain_core.runnables import RunnableSequence
-from langchain_openai import ChatOpenAI
 
 from .data_loader import (
     build_files_context,
@@ -30,14 +29,21 @@ from .vulnerability_catalog import get_vulnerabilities
 CONFIG_FILENAME = ".scout"
 logger = logging.getLogger(__name__)
 
+PROVIDER_TO_ENV = {
+    "openai": "OPENAI_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "gemini": "GEMINI_API_KEY",
+}
 
-def should_execute_llm(explicit_dry_run: bool) -> bool:
+
+def should_execute_llm(explicit_dry_run: bool, provider: str) -> bool:
     if explicit_dry_run:
         logger.info("Dry-run flag active; LLM execution disabled.")
         return False
-    has_key = bool(os.getenv("OPENAI_API_KEY"))
+    api_key_env = PROVIDER_TO_ENV[provider]
+    has_key = bool(os.getenv(api_key_env))
     if not has_key:
-        logger.warning("OPENAI_API_KEY not set; defaulting to dry-run output.")
+        logger.warning(f"{api_key_env} not set; defaulting to dry-run output.")
     return has_key
 
 
@@ -53,13 +59,45 @@ def build_prompt(prompt_text: str) -> ChatPromptTemplate:
     )
 
 
-def create_chain(prompt: ChatPromptTemplate, model_name: str) -> RunnableSequence:
-    logger.info("Creating LangChain pipeline with model '%s'.", model_name)
-    llm = ChatOpenAI(
-        model=model_name,
-        temperature=1,
-        model_kwargs={"reasoning_effort": "high"},
+def create_chain(
+    prompt: ChatPromptTemplate, model_name: str, provider: str
+) -> RunnableSequence:
+    logger.info(
+        "Creating LangChain pipeline with provider '%s' and model '%s'.",
+        provider,
+        model_name,
     )
+    match provider:
+        case "openai":
+            try:
+                from langchain_openai import ChatOpenAI
+            except ImportError:
+                raise ImportError(
+                    "langchain_openai is not installed. Install it with: pip install langchain-openai"
+                )
+            llm = ChatOpenAI(
+                model=model_name,
+                temperature=1,
+                model_kwargs={"reasoning_effort": "high"},
+            )
+        case "anthropic":
+            try:
+                from langchain_anthropic import ChatAnthropic
+            except ImportError:
+                raise ImportError(
+                    "langchain_anthropic is not installed. Install it with: pip install langchain-anthropic"
+                )
+            llm = ChatAnthropic(model=model_name, temperature=1)
+        case "gemini":
+            try:
+                from langchain_google_genai import ChatGoogleGenerativeAI
+            except ImportError:
+                raise ImportError(
+                    "langchain_google_genai is not installed. Install it with: pip install langchain-google-genai"
+                )
+            llm = ChatGoogleGenerativeAI(model=model_name, temperature=1)
+        case _:
+            raise ValueError(f"Unsupported provider: {provider}")
     return prompt | llm | StrOutputParser()
 
 
@@ -138,6 +176,13 @@ def run_analysis(args) -> int:
     logger.info(
         "Starting analysis run. target=%s dry_run=%s", target_root, args.dry_run
     )
+
+    # Set default model based on provider if not specified
+    if not os.getenv("SCOUT_AI_MODEL"):
+        if args.provider == "anthropic":
+            args.model = "claude-sonnet-4-5-20250929"
+        # openai already defaults to gpt-5
+
     config_path = resolve_config_path(target_root, args.config)
     config = load_config(config_path)
     prompt_text = read_prompt_file(DEFAULT_PROMPT_PATH)
@@ -164,10 +209,13 @@ def run_analysis(args) -> int:
     )
     prompt = build_prompt(prompt_text)
 
-    if not should_execute_llm(args.dry_run):
+    if not should_execute_llm(args.dry_run, args.provider):
         logger.info("Rendering composed prompt without executing the LLM.")
+        api_key_name = (
+            "OPENAI_API_KEY" if args.provider == "openai" else "ANTHROPIC_API_KEY"
+        )
         print(
-            "[DRY-RUN] Displaying composed prompt. Provide OPENAI_API_KEY to execute.\n"
+            f"[DRY-RUN] Displaying composed prompt. Provide {api_key_name} to execute.\n"
         )
         messages = prompt.format_messages(**chain_inputs)
         for message in messages:
@@ -176,7 +224,7 @@ def run_analysis(args) -> int:
         return 0
 
     try:
-        chain = create_chain(prompt, args.model)
+        chain = create_chain(prompt, args.model, args.provider)
         result = chain.invoke(chain_inputs)
     except Exception as exc:
         logger.exception("Failed to execute LangChain pipeline.")

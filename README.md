@@ -10,6 +10,23 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### Environment Setup
+
+For LLM API access, set up your environment variables:
+
+```bash
+# Load environment variables from .env file
+source .envrc
+
+# Or manually set:
+export OPENAI_API_KEY="your-api-key-here"
+export ANTHROPIC_API_KEY="your-anthropic-key-here"  # for Anthropic Claude
+export SCOUT_AI_PROVIDER="openai"  # or "anthropic", defaults to openai
+export SCOUT_AI_MODEL="gpt-5"  # optional, defaults to gpt-5 for openai, claude-sonnet-4-5-20250929 for anthropic
+```
+
+The `.envrc` script automatically loads variables from a `.env` file (which is gitignored for security).
+
 Usage mirrors the requested interface:
 
 ```bash
@@ -23,6 +40,7 @@ The CLI automatically looks for a file named `.scout` inside the target director
 Pass `--include-deps` to inspect each listed Rust file for local `mod foo;` declarations and any `use` paths (e.g., `use crate::foo::bar`) so that referenced modules are automatically added to the prompt. Control recursion with `--dependency-depth` (default `1`), which is ignored unless dependencies are enabled. Installing `tree_sitter` and `tree_sitter_languages` (added to `requirements.txt`) is required for this flag.
 
 Remove `--dry-run` and set `OPENAI_API_KEY` once you are ready to hit your provider (the CLI uses `langchain-openai`'s `ChatOpenAI` under the hood). Define `SCOUT_AI_MODEL` to override the default model name (defaults to `gpt-5`).
+Remove `--dry-run` and set the appropriate API key once you are ready to hit your provider. Use `--provider anthropic` to switch to Anthropic Claude models. Define `SCOUT_AI_MODEL` to override the default model name (defaults to `gpt-5` for OpenAI, `claude-sonnet-4-5-20250929` for Anthropic).
 
 For a richer dependency graph demo, run the complex example:
 
@@ -67,8 +85,9 @@ Each project keeps a single file literally named `.scout`, located at the direct
 
 ## Running against real models
 
-1. Export `OPENAI_API_KEY` (or configure your preferred backend inside `scout_ai_poc/main.py`).
-2. Drop the `--dry-run` flag.
-3. Execute the CLI as shown above; LangChain's runnable pipeline (`prompt | llm | parser`) will render the template and send it to the model.
+1. Export `OPENAI_API_KEY` for OpenAI models or `ANTHROPIC_API_KEY` for Anthropic Claude models.
+2. Optionally set `SCOUT_AI_PROVIDER` to "anthropic" to use Anthropic (defaults to "openai").
+3. Drop the `--dry-run` flag.
+4. Execute the CLI as shown above; LangChain's runnable pipeline (`prompt | llm | parser`) will render the template and send it to the model.
 
 The CLI prints the composed prompt when credentials are absent, so you can verify everything before burning tokens.
