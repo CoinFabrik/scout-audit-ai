@@ -22,6 +22,7 @@ from .data_loader import (
     load_extra_inputs,
     read_prompt_file,
 )
+from .dependency_analyzer import include_dependencies
 from .paths import DEFAULT_PROMPT_PATH
 from .vulnerability_catalog import get_vulnerabilities
 
@@ -187,9 +188,22 @@ def run_analysis(args) -> int:
     prompt_text = read_prompt_file(DEFAULT_PROMPT_PATH)
 
     extra_prompt_path = Path(args.extra_prompt) if args.extra_prompt else None
+    file_list = config["files"]
+    if args.include_deps:
+        if args.dependency_depth < 1:
+            logger.error("--dependency-depth must be >= 1 when using --include-deps.")
+            return 1
+        file_list = include_dependencies(
+            file_list, target_root, args.dependency_depth
+        )
+    elif args.dependency_depth != 1:
+        logger.warning(
+            "--dependency-depth is ignored unless --include-deps is provided."
+        )
+
     chain_inputs = assemble_chain_inputs(
         config["contract_type"],
-        config["files"],
+        file_list,
         target_root,
         extra_prompt_path,
     )

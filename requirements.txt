@@ -2,3 +2,5 @@ langchain==1.0.2
 langchain-openai==1.0.1
 langchain-anthropic==1.0.0
 langchain-google-genai==3.0.0
+tree_sitter==0.25.2
+tree_sitter_languages==1.10.2

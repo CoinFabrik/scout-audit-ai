@@ -1,0 +1,6 @@
+{
+  "contract_type": "router",
+  "files": [
+    "contracts/gateway.rs"
+  ]
+}
