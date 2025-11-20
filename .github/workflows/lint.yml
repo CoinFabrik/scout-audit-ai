@@ -1,0 +1,58 @@
+name: Lint and Syntax
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install lint tools
+        run: pip install --upgrade pip ruff
+
+      - name: Compile sources
+        run: python -m compileall scout_ai_poc
+
+      - name: Ruff lint
+        run: ruff check scout_ai_poc
+
+  dependency-hygiene:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependency tools
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt deptry pip-audit
+
+      - name: Verify installed packages resolve
+        run: python -m pip check
+
+      - name: Detect unused or missing requirements
+        run: deptry scout_ai_poc --requirements requirements.txt
+
+      - name: Audit for known vulnerabilities
+        run: pip-audit -r requirements.txt --progress-spinner off

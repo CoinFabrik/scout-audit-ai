@@ -6,6 +6,8 @@ import os
 import sys
 from typing import List
 
+from dotenv import load_dotenv
+
 from .cli import parse_args
 from .runner import run_analysis
 
@@ -27,7 +29,13 @@ def configure_logging() -> None:
     logging.basicConfig(level=level, format=LOG_FORMAT)
 
 
+def load_environment() -> None:
+    """Pull variables from a local .env if present."""
+    load_dotenv()
+
+
 def main(argv: List[str] | None = None) -> int:
+    load_environment()
     configure_logging()
     args = parse_args(argv)
     return run_analysis(args)

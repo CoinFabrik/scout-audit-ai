@@ -12,20 +12,17 @@ pip install -r requirements.txt
 
 ### Environment Setup
 
-For LLM API access, set up your environment variables:
+For LLM API access, expose a single `API_KEY` (either by `source .envrc` or by exporting it yourself):
 
 ```bash
-# Load environment variables from .env file
-source .envrc
+source .envrc  # loads values from .env automatically
 
-# Or manually set:
-export OPENAI_API_KEY="your-api-key-here"
-export ANTHROPIC_API_KEY="your-anthropic-key-here"  # for Anthropic Claude
-export SCOUT_AI_PROVIDER="openai"  # or "anthropic", defaults to openai
-export SCOUT_AI_MODEL="gpt-5"  # optional, defaults to gpt-5 for openai, claude-sonnet-4-5-20250929 for anthropic
+# Or manually:
+export API_KEY="your-model-key"
+export SCOUT_LOG_LEVEL="INFO"  # optional; controls logging verbosity
 ```
 
-The `.envrc` script automatically loads variables from a `.env` file (which is gitignored for security).
+The CLI reads `.env` automatically through `python-dotenv`, so defining `API_KEY=...` in that file is usually the easiest approach.
 
 Usage mirrors the requested interface:
 
@@ -37,10 +34,16 @@ Usage mirrors the requested interface:
 
 The CLI automatically looks for a file named `.scout` inside the target directory. Pass `--config <path>` only when you need to point discovery at a different directory (or at an explicit `.scout` file).
 
+<<<<<<< Updated upstream
 Pass `--include-deps` to inspect each listed Rust file for local `mod foo;` declarations and any `use` paths (e.g., `use crate::foo::bar`) so that referenced modules are automatically added to the prompt. Control recursion with `--dependency-depth` (default `1`), which is ignored unless dependencies are enabled. Installing `tree_sitter` and `tree_sitter_languages` (added to `requirements.txt`) is required for this flag.
 
 Remove `--dry-run` and set `OPENAI_API_KEY` once you are ready to hit your provider (the CLI uses `langchain-openai`'s `ChatOpenAI` under the hood). Define `SCOUT_AI_MODEL` to override the default model name (defaults to `gpt-5`).
 Remove `--dry-run` and set the appropriate API key once you are ready to hit your provider. Use `--provider anthropic` to switch to Anthropic Claude models. Define `SCOUT_AI_MODEL` to override the default model name (defaults to `gpt-5` for OpenAI, `claude-sonnet-4-5-20250929` for Anthropic).
+=======
+Pass `--include-deps` to inspect each listed Rust file for local `mod foo;` declarations and any `use` paths (e.g., `use crate::foo::bar`) so that referenced modules are automatically added to the prompt. Control recursion with `--dependency-depth` (default `1`), which is ignored unless dependencies are enabled. Installing `tree_sitter` and `tree_sitter_languages` (added to `requirements.txt`) is required for this flag.
+
+Remove `--dry-run` and set `API_KEY` once you are ready to hit your provider. The CLI automatically infers which backend to call based on the model string defined in `.scout` (override it per-run via `--model`). Supported models are enumerated inside `scout_ai_poc/llm_config.py`—if you pass an unknown model, the CLI will tell you which options are available per provider.
+>>>>>>> Stashed changes
 
 For a richer dependency graph demo, run the complex example:
 
@@ -71,13 +74,16 @@ Each project keeps a single file literally named `.scout`, located at the direct
 ```json
 {
   "contract_type": "dex",
-  "files": [
-    "relative/or/absolute/path/to/file.rs"
-  ]
+  "model": "gpt-5.1-mini",
+  "files": ["relative/or/absolute/path/to/file.rs"]
 }
 ```
 
-`contract_type` is used to select known vulnerabilities. `files` entries are resolved relative to the CLI's `target` argument and inlined into the prompt in the order provided.
+`contract_type` selects the vulnerability catalog. `model` controls which LLM to use (and implicitly which provider is invoked). `files` entries are resolved relative to `target` and inlined into the prompt in the order provided.
+
+### Deterministic LLM configuration
+
+Each supported model has an explicit deterministic preset in `scout_ai_poc/llm_config.py`. We start from a shared base (temperature `0.0`, fixed `seed`, zero penalties) and then specialize by provider/model—for example, Gemini forces `top_p=0`/`top_k=1`, while `gpt-5.1` drops `temperature` entirely because that endpoint rejects it and instead receives only the `reasoning_effort` hint. The adapter only forwards knobs the backend accepts so errors from unsupported parameters are avoided.
 
 ## Extra prompt inputs
 
@@ -85,9 +91,9 @@ Each project keeps a single file literally named `.scout`, located at the direct
 
 ## Running against real models
 
-1. Export `OPENAI_API_KEY` for OpenAI models or `ANTHROPIC_API_KEY` for Anthropic Claude models.
-2. Optionally set `SCOUT_AI_PROVIDER` to "anthropic" to use Anthropic (defaults to "openai").
-3. Drop the `--dry-run` flag.
-4. Execute the CLI as shown above; LangChain's runnable pipeline (`prompt | llm | parser`) will render the template and send it to the model.
+1. Define `API_KEY` (via `.env` or `export API_KEY=...`).
+2. Drop the `--dry-run` flag.
+3. Ensure your `.scout` file specifies the desired `model` (or pass `--model` to override it).
+4. Execute the CLI; LangChain's runnable pipeline (`prompt | llm | parser`) will render the template and send it to the inferred provider.
 
-The CLI prints the composed prompt when credentials are absent, so you can verify everything before burning tokens.
+When `API_KEY` is missing, the CLI prints the composed prompt so you can verify everything before burning tokens.

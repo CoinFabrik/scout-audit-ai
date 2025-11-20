@@ -22,12 +22,10 @@ PYTHONPATH.
 - `./scout-ai-poc examples --dry-run` — autodetects `examples/.scout` and
   renders the composed prompt without calling an LLM; ideal for debugging
   configs.
-- `OPENAI_API_KEY=... ./scout-ai-poc <target> --extraPrompt prompts/input_validation.json`
-  — run end-to-end against OpenAI (default provider).
-- `ANTHROPIC_API_KEY=... ./scout-ai-poc <target> --provider anthropic --model claude-sonnet-4-5-20250929`
-  — run end-to-end against Anthropic. Override provider with `SCOUT_AI_PROVIDER`
-  and model with `SCOUT_AI_MODEL` as needed. Pass `--config <path>` only when
-  the `.scout` file lives outside `<target>`.
+- `API_KEY=... ./scout-ai-poc <target> --extraPrompt prompts/input_validation.json`
+  — run end-to-end; the provider is inferred from the model specified in `.scout`
+  (override with `--model` if needed). Pass `--config <path>` only when the
+  `.scout` file lives outside `<target>`.
 
 ## Coding Style & Naming Conventions
 
@@ -61,7 +59,7 @@ reviewers can quickly reason about risk.
 
 ## Security & Configuration Tips
 
-Never commit real `OPENAI_API_KEY` values or production `.scout` files—treat
+Never commit real `API_KEY` values or production `.scout` files—treat
 them as secrets and load through environment variables. Validate `.scout` inputs
 before running remote analyses, especially if contract sources come from
 untrusted repositories. When sharing prompt snippets, scrub customer-identifying
