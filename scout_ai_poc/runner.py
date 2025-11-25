@@ -1,5 +1,3 @@
-"""High-level orchestration for scout-ai-poc."""
-
 from __future__ import annotations
 
 import logging
@@ -49,7 +47,6 @@ def should_execute_llm(explicit_dry_run: bool, api_key: str | None) -> bool:
 
 
 def build_prompt(prompt_text: str) -> ChatPromptTemplate:
-    """Return a chat prompt that keeps system rules separate from file context."""
     return ChatPromptTemplate.from_messages(
         [
             SystemMessagePromptTemplate.from_template(prompt_text),
@@ -61,7 +58,6 @@ def build_prompt(prompt_text: str) -> ChatPromptTemplate:
 
 
 def format_known_vulnerabilities(vulnerabilities: Iterable[str]) -> str:
-    """Present catalog entries as a numbered list with a graceful empty fallback."""
     entries = [entry.strip() for entry in vulnerabilities if entry and entry.strip()]
     if not entries:
         return "\n- None documented."
@@ -96,7 +92,6 @@ def assemble_chain_inputs(
 
 
 def resolve_config_path(target_root: Path, config_override: str | None) -> Path:
-    """Locate the canonical .scout file."""
     search_root = Path(config_override).expanduser() if config_override else target_root
     search_root = search_root.resolve()
     logger.debug(

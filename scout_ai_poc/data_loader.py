@@ -1,4 +1,3 @@
-"""Input helpers for scout-ai-poc."""
 from __future__ import annotations
 
 import json
@@ -10,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 def load_config(path: Path) -> Dict[str, Any]:
-    """Parse the .scout configuration."""
     if not path.exists():
         raise FileNotFoundError(f"Missing config file: {path}")
 

@@ -1,4 +1,3 @@
-"""Entry point for the scout-ai-poc CLI."""
 from __future__ import annotations
 
 import logging
@@ -15,7 +14,6 @@ LOG_FORMAT = "%(asctime)s %(levelname)s [%(name)s] %(message)s"
 
 
 def configure_logging() -> None:
-    """Configure a simple stdout logger honoring SCOUT_LOG_LEVEL."""
     level_name = os.getenv("SCOUT_LOG_LEVEL", "INFO").upper()
     if not hasattr(logging, level_name):
         level = logging.INFO
@@ -30,7 +28,6 @@ def configure_logging() -> None:
 
 
 def load_environment() -> None:
-    """Pull variables from a local .env if present."""
     load_dotenv()
 
 

@@ -1,16 +1,12 @@
-"""Centralized deterministic configuration per supported model."""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Mapping
+from typing import Any, Final, Mapping
 
 
-# Single place to tweak the seed if you ever need to.
-DEFAULT_SEED = 42
+DEFAULT_SEED: Final[int] = 42
 
-# Non-reasoning OpenAI models (e.g., gpt-4.1*) – deterministic settings
-OPENAI_NON_REASONING_PARAMS: dict[str, Any] = {
+OPENAI_NON_REASONING_PARAMS: Final[dict[str, Any]] = {
     "temperature": 0.0,
     "top_p": 1.0,
     "n": 1,
@@ -19,34 +15,28 @@ OPENAI_NON_REASONING_PARAMS: dict[str, Any] = {
     "frequency_penalty": 0.0,
 }
 
-# Reasoning models that expect `reasoning_effort="..."` as a top-level kwarg
-OPENAI_REASONING_PARAMS: dict[str, Any] = {
+OPENAI_REASONING_PARAMS: Final[dict[str, Any]] = {
     "seed": DEFAULT_SEED,
     "reasoning_effort": "high",
 }
 
-ANTHROPIC_PARAMS: dict[str, Any] = {
+ANTHROPIC_PARAMS: Final[dict[str, Any]] = {
     "temperature": 0.0,
 }
 
-GEMINI_PARAMS: dict[str, Any] = {
+GEMINI_PARAMS: Final[dict[str, Any]] = {
     "temperature": 0.0,
     "top_k": 1,
     "n": 1,
 }
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class LLMConfig:
-    """Immutable bundle of kwargs."""
-
     client_kwargs: Mapping[str, Any] = field(default_factory=dict)
 
     def as_kwargs(self) -> dict[str, Any]:
-        """Returns a deep copy of args for the LangChain constructor."""
-        import copy
-
-        return copy.deepcopy(dict(self.client_kwargs))
+        return dict(self.client_kwargs)
 
 
 def openai_conf(
@@ -54,30 +44,19 @@ def openai_conf(
     reasoning: bool,
     **overrides: Any,
 ) -> LLMConfig:
-    if reasoning:
-        base = OPENAI_REASONING_PARAMS
-    else:
-        base = OPENAI_NON_REASONING_PARAMS
-
-    kwargs = {**base, **overrides}
-    return LLMConfig(kwargs)
+    base = OPENAI_REASONING_PARAMS if reasoning else OPENAI_NON_REASONING_PARAMS
+    return LLMConfig({**base, **overrides})
 
 
-def anthropic_conf(
-    **overrides: Any,
-) -> LLMConfig:
-    kwargs = {**ANTHROPIC_PARAMS, **overrides}
-    return LLMConfig(kwargs)
+def anthropic_conf(**overrides: Any) -> LLMConfig:
+    return LLMConfig({**ANTHROPIC_PARAMS, **overrides})
 
 
-def gemini_conf(
-    **overrides: Any,
-) -> LLMConfig:
-    kwargs = {**GEMINI_PARAMS, **overrides}
-    return LLMConfig(kwargs)
+def gemini_conf(**overrides: Any) -> LLMConfig:
+    return LLMConfig({**GEMINI_PARAMS, **overrides})
 
 
-MODEL_CONFIGS = {
+MODEL_CONFIGS: Final[dict[str, dict[str, LLMConfig]]] = {
     "openai": {
         "gpt-5.1": openai_conf(reasoning=True),
         "gpt-5.1-2025-11-13": openai_conf(reasoning=True),
@@ -114,9 +93,7 @@ MODEL_CONFIGS = {
     },
 }
 
-
-# Aliases for convenience (point to versioned models)
-MODEL_ALIASES = {
+MODEL_ALIASES: Final[dict[str, dict[str, str]]] = {
     "openai": {
         "gpt-5.1-latest": "gpt-5.1",
     },

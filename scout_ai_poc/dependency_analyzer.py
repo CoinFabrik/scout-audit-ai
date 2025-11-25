@@ -1,10 +1,3 @@
-"""Discover Rust source dependencies for files listed in .scout configs.
-
-The analyzer parses each referenced file with Tree-sitter, follows `mod foo;`
-and `use crate::foo::...` statements, and returns a breadth-first-expanded file
-list respecting the user-provided depth limit.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -24,7 +17,6 @@ _PARSER.set_language(get_language("rust"))
 
 @dataclass
 class UseEntry:
-    """Represents a fully-qualified use path plus glob metadata."""
     segments: List[str]
     is_glob: bool = False
 
@@ -34,7 +26,6 @@ def _node_text(node: Node, source_bytes: bytes) -> str:
 
 
 def _flatten_identifier(node: Node, source_bytes: bytes) -> List[str]:
-    """Expand scoped identifiers into individual path segments."""
     if node.type == "scoped_identifier":
         parts: List[str] = []
         for child in node.children:
@@ -48,7 +39,6 @@ def _flatten_identifier(node: Node, source_bytes: bytes) -> List[str]:
 
 
 def _extract_module_names(root: Node, source_bytes: bytes) -> List[str]:
-    """Return `mod foo;` declarations detected via Tree-sitter."""
     modules: List[str] = []
     stack = [root]
 
@@ -66,7 +56,6 @@ def _extract_module_names(root: Node, source_bytes: bytes) -> List[str]:
 def _collect_use_entries(
     node: Node, source_bytes: bytes, prefix: List[str]
 ) -> List[UseEntry]:
-    """Flatten nested use declarations into usable UseEntry records."""
     entries: List[UseEntry] = []
     node_type = node.type
 
@@ -220,7 +209,6 @@ def _resolve_declared_modules(
 def _derive_use_base_directory(
     segments: Sequence[str], current_file: Path, project_root: Path
 ) -> Tuple[Path, List[str]]:
-    """Return the filesystem base dir and remaining module segments for a use path."""
     if not segments:
         return current_file.parent, []
 
@@ -247,7 +235,6 @@ def _derive_use_base_directory(
 def _candidate_segment_lists(
     module_segments: List[str], is_glob: bool
 ) -> List[List[str]]:
-    """Return raw segments plus potential parent module fallbacks for inline items."""
     if not module_segments:
         return []
 
@@ -275,7 +262,6 @@ def _resolve_segments_to_path(base_dir: Path, segments: List[str]) -> Path | Non
 def _resolve_use_entry(
     entry: UseEntry, current_file: Path, project_root: Path
 ) -> Path | None:
-    """Resolve a use path to a concrete file if it lives under the target root."""
     base_dir, module_segments = _derive_use_base_directory(
         entry.segments, current_file, project_root
     )
@@ -309,7 +295,6 @@ def _resolve_use_entry(
 def _resolve_use_dependencies(
     use_entries: Iterable[UseEntry], current_file: Path, project_root: Path
 ) -> List[Path]:
-    """Return unique file paths referenced via use statements."""
     dependencies: List[Path] = []
     seen: Set[Path] = set()
     for entry in use_entries:
@@ -352,7 +337,6 @@ def _find_local_module_files(current_file: Path, project_root: Path) -> List[Pat
 def include_dependencies(
     file_paths: Iterable[str], target_root: Path, max_depth: int
 ) -> List[str]:
-    """Return file list plus dependencies discovered up to ``max_depth``."""
     if max_depth < 1:
         logger.info("Dependency depth < 1 provided; returning original file list only.")
         max_depth = 0

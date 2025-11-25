@@ -1,5 +1,3 @@
-"""Provider inference, defaults, and factory helpers."""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -112,5 +110,6 @@ def infer_provider(model_name: str) -> Tuple[Provider, LLMConfig]:
     raise ValueError(
         f"Model '{model_name}' is not supported. Available options -> {supported}"
     )
+
 
 __all__ = ["Provider", "infer_provider", "PROVIDERS"]
