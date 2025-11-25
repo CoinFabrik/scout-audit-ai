@@ -52,7 +52,7 @@ jobs:
         run: python -m pip check
 
       - name: Detect unused or missing requirements
-        run: deptry scout_ai_poc --requirements requirements.txt
+        run: deptry scout_ai_poc
 
       - name: Audit for known vulnerabilities
         run: pip-audit -r requirements.txt --progress-spinner off
