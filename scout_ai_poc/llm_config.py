@@ -86,6 +86,7 @@ MODEL_CONFIGS: Final[dict[str, dict[str, LLMConfig]]] = {
         "claude-3-5-haiku-20241022": anthropic_conf(),
     },
     "gemini": {
+        "gemini-3-pro-preview": gemini_conf(),
         "gemini-2.5-pro": gemini_conf(),
         "gemini-2.5-flash": gemini_conf(),
         "gemini-2.5-flash-lite": gemini_conf(),
