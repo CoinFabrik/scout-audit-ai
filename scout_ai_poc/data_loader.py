@@ -1,4 +1,3 @@
-"""Input helpers for scout-ai-poc."""
 from __future__ import annotations
 
 import json
@@ -10,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 def load_config(path: Path) -> Dict[str, Any]:
-    """Parse the .scout configuration."""
     if not path.exists():
         raise FileNotFoundError(f"Missing config file: {path}")
 
@@ -22,17 +20,21 @@ def load_config(path: Path) -> Dict[str, Any]:
 
     contract_type = data.get("contract_type")
     files = data.get("files", [])
+    model = data.get("model")
 
     if not contract_type:
         raise ValueError("config file must include 'contract_type'")
     if not isinstance(files, Iterable) or isinstance(files, (str, bytes)):
         raise ValueError("'files' must be a list of paths")
+    if model is not None and not isinstance(model, str):
+        raise ValueError("'model' must be a string when provided")
 
     normalized_files = [str(item) for item in files]
 
     return {
         "contract_type": contract_type,
         "files": normalized_files,
+        "model": model,
     }
 
 

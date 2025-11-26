@@ -1,5 +1,6 @@
 {
   "contract_type": "lending",
+  "model": "gpt-5.1",
   "files": [
     "contracts/swap.rs"
   ]

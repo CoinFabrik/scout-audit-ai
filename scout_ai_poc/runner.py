@@ -1,5 +1,3 @@
-"""High-level orchestration for scout-ai-poc."""
-
 from __future__ import annotations
 
 import logging
@@ -14,7 +12,7 @@ from langchain_core.prompts import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-from langchain_core.runnables import RunnableSequence
+
 
 from .data_loader import (
     build_files_context,
@@ -24,31 +22,31 @@ from .data_loader import (
 )
 from .dependency_analyzer import include_dependencies
 from .paths import DEFAULT_PROMPT_PATH
+from .providers import infer_provider
 from .vulnerability_catalog import get_vulnerabilities
 
 CONFIG_FILENAME = ".scout"
 logger = logging.getLogger(__name__)
 
-PROVIDER_TO_ENV = {
-    "openai": "OPENAI_API_KEY",
-    "anthropic": "ANTHROPIC_API_KEY",
-    "gemini": "GOOGLE_API_KEY",
-}
+
+def get_api_key() -> str | None:
+    api_key = os.getenv("API_KEY")
+    if api_key:
+        return api_key.strip() or None
+    return None
 
 
-def should_execute_llm(explicit_dry_run: bool, provider: str) -> bool:
+def should_execute_llm(explicit_dry_run: bool, api_key: str | None) -> bool:
     if explicit_dry_run:
         logger.info("Dry-run flag active; LLM execution disabled.")
         return False
-    api_key_env = PROVIDER_TO_ENV[provider]
-    has_key = bool(os.getenv(api_key_env))
-    if not has_key:
-        logger.warning(f"{api_key_env} not set; defaulting to dry-run output.")
-    return has_key
+    if not api_key:
+        logger.warning("API_KEY not set; defaulting to dry-run output.")
+        return False
+    return True
 
 
 def build_prompt(prompt_text: str) -> ChatPromptTemplate:
-    """Return a chat prompt that keeps system rules separate from file context."""
     return ChatPromptTemplate.from_messages(
         [
             SystemMessagePromptTemplate.from_template(prompt_text),
@@ -59,50 +57,7 @@ def build_prompt(prompt_text: str) -> ChatPromptTemplate:
     )
 
 
-def create_chain(
-    prompt: ChatPromptTemplate, model_name: str, provider: str
-) -> RunnableSequence:
-    logger.info(
-        "Creating LangChain pipeline with provider '%s' and model '%s'.",
-        provider,
-        model_name,
-    )
-    match provider:
-        case "openai":
-            try:
-                from langchain_openai import ChatOpenAI
-            except ImportError:
-                raise ImportError(
-                    "langchain_openai is not installed. Install it with: pip install langchain-openai"
-                )
-            llm = ChatOpenAI(
-                model=model_name,
-                temperature=1,
-                model_kwargs={"reasoning_effort": "high"},
-            )
-        case "anthropic":
-            try:
-                from langchain_anthropic import ChatAnthropic
-            except ImportError:
-                raise ImportError(
-                    "langchain_anthropic is not installed. Install it with: pip install langchain-anthropic"
-                )
-            llm = ChatAnthropic(model=model_name, temperature=1)
-        case "gemini":
-            try:
-                from langchain_google_genai import ChatGoogleGenerativeAI
-            except ImportError:
-                raise ImportError(
-                    "langchain_google_genai is not installed. Install it with: pip install langchain-google-genai"
-                )
-            llm = ChatGoogleGenerativeAI(model=model_name, temperature=1)
-        case _:
-            raise ValueError(f"Unsupported provider: {provider}")
-    return prompt | llm | StrOutputParser()
-
-
 def format_known_vulnerabilities(vulnerabilities: Iterable[str]) -> str:
-    """Present catalog entries as a numbered list with a graceful empty fallback."""
     entries = [entry.strip() for entry in vulnerabilities if entry and entry.strip()]
     if not entries:
         return "\n- None documented."
@@ -137,7 +92,6 @@ def assemble_chain_inputs(
 
 
 def resolve_config_path(target_root: Path, config_override: str | None) -> Path:
-    """Locate the canonical .scout file."""
     search_root = Path(config_override).expanduser() if config_override else target_root
     search_root = search_root.resolve()
     logger.debug(
@@ -177,15 +131,26 @@ def run_analysis(args) -> int:
         "Starting analysis run. target=%s dry_run=%s", target_root, args.dry_run
     )
 
-    # Set default model based on provider if not specified
-    if not os.getenv("SCOUT_AI_MODEL"):
-        if args.provider == "anthropic":
-            args.model = "claude-sonnet-4-5-20250929"
-        # openai already defaults to gpt-5
-
     config_path = resolve_config_path(target_root, args.config)
     config = load_config(config_path)
     prompt_text = read_prompt_file(DEFAULT_PROMPT_PATH)
+
+    model_name = args.model or config.get("model")
+    if not model_name:
+        logger.error(
+            "No model specified. Provide --model or add a 'model' field to %s.",
+            config_path,
+        )
+        return 1
+
+    model_source = "CLI flag" if args.model else ".scout config"
+    logger.info("Using model '%s' from %s.", model_name, model_source)
+    try:
+        provider, provider_config = infer_provider(model_name)
+    except ValueError as exc:
+        logger.error("%s", exc)
+        return 1
+    logger.info("Inferred provider '%s' for model '%s'.", provider.name, model_name)
 
     extra_prompt_path = Path(args.extra_prompt) if args.extra_prompt else None
     file_list = config["files"]
@@ -193,9 +158,7 @@ def run_analysis(args) -> int:
         if args.dependency_depth < 1:
             logger.error("--dependency-depth must be >= 1 when using --include-deps.")
             return 1
-        file_list = include_dependencies(
-            file_list, target_root, args.dependency_depth
-        )
+        file_list = include_dependencies(file_list, target_root, args.dependency_depth)
     elif args.dependency_depth != 1:
         logger.warning(
             "--dependency-depth is ignored unless --include-deps is provided."
@@ -209,13 +172,12 @@ def run_analysis(args) -> int:
     )
     prompt = build_prompt(prompt_text)
 
-    if not should_execute_llm(args.dry_run, args.provider):
+    api_key = get_api_key()
+    if not should_execute_llm(args.dry_run, api_key):
         logger.info("Rendering composed prompt without executing the LLM.")
-        api_key_name = (
-            "OPENAI_API_KEY" if args.provider == "openai" else "ANTHROPIC_API_KEY"
-        )
         print(
-            f"[DRY-RUN] Displaying composed prompt. Provide {api_key_name} to execute.\n"
+            "[DRY-RUN] Displaying composed prompt. Provide API_KEY in your "
+            "environment (or .env) to execute.\n"
         )
         messages = prompt.format_messages(**chain_inputs)
         for message in messages:
@@ -224,7 +186,13 @@ def run_analysis(args) -> int:
         return 0
 
     try:
-        chain = create_chain(prompt, args.model, args.provider)
+        logger.info(
+            "Creating LangChain pipeline with provider '%s' and model '%s'.",
+            provider.name,
+            model_name,
+        )
+        llm = provider.builder(model_name, api_key, provider_config)
+        chain = prompt | llm | StrOutputParser()
         result = chain.invoke(chain_inputs)
     except Exception as exc:
         logger.exception("Failed to execute LangChain pipeline.")
