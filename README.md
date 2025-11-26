@@ -34,16 +34,8 @@ Usage mirrors the requested interface:
 
 The CLI automatically looks for a file named `.scout` inside the target directory. Pass `--config <path>` only when you need to point discovery at a different directory (or at an explicit `.scout` file).
 
-<<<<<<< Updated upstream
 Pass `--include-deps` to inspect each listed Rust file for local `mod foo;` declarations and any `use` paths (e.g., `use crate::foo::bar`) so that referenced modules are automatically added to the prompt. Control recursion with `--dependency-depth` (default `1`), which is ignored unless dependencies are enabled. Installing `tree_sitter` and `tree_sitter_languages` (added to `requirements.txt`) is required for this flag.
-
-Remove `--dry-run` and set `OPENAI_API_KEY` once you are ready to hit your provider (the CLI uses `langchain-openai`'s `ChatOpenAI` under the hood). Define `SCOUT_AI_MODEL` to override the default model name (defaults to `gpt-5`).
-Remove `--dry-run` and set the appropriate API key once you are ready to hit your provider. Use `--provider anthropic` to switch to Anthropic Claude models. Define `SCOUT_AI_MODEL` to override the default model name (defaults to `gpt-5` for OpenAI, `claude-sonnet-4-5-20250929` for Anthropic).
-=======
-Pass `--include-deps` to inspect each listed Rust file for local `mod foo;` declarations and any `use` paths (e.g., `use crate::foo::bar`) so that referenced modules are automatically added to the prompt. Control recursion with `--dependency-depth` (default `1`), which is ignored unless dependencies are enabled. Installing `tree_sitter` and `tree_sitter_languages` (added to `requirements.txt`) is required for this flag.
-
 Remove `--dry-run` and set `API_KEY` once you are ready to hit your provider. The CLI automatically infers which backend to call based on the model string defined in `.scout` (override it per-run via `--model`). Supported models are enumerated inside `scout_ai_poc/llm_config.py`—if you pass an unknown model, the CLI will tell you which options are available per provider.
->>>>>>> Stashed changes
 
 For a richer dependency graph demo, run the complex example:
 
