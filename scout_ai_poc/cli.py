@@ -24,7 +24,7 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
         ),
     )
     parser.add_argument(
-        "--extraPrompt",
+        "--extra-prompt",
         dest="extra_prompt",
         help="Optional JSON/text file with additional instructions for the LLM.",
     )

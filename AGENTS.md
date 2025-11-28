@@ -7,7 +7,7 @@ The CLI logic lives inside `scout_ai_poc/`: `cli.py` handles argument parsing,
 stitches vulnerability catalogs into the final payload, and `main.py` wires
 everything together. `prompts/` stores reusable template fragments (edit
 `base_prompt.txt` to shift tone, and drop JSON snippets that can be referenced
-with `--extraPrompt`). Use `examples/` for contract fixtures such as
+with `--extra-prompt`). Use `examples/` for contract fixtures such as
 `contracts/swap.rs`; the canonical config there is `examples/.scout`. The
 root-level `scout-ai-poc` Bash shim simply forwards to
 `python3 -m scout_ai_poc.main`, allowing you to invoke the tool without touching
@@ -22,7 +22,7 @@ PYTHONPATH.
 - `./scout-ai-poc examples --dry-run` — autodetects `examples/.scout` and
   renders the composed prompt without calling an LLM; ideal for debugging
   configs.
-- `API_KEY=... ./scout-ai-poc <target> --extraPrompt prompts/input_validation.json`
+- `API_KEY=... ./scout-ai-poc <target> --extra-prompt prompts/input_validation.json`
   — run end-to-end; the provider is inferred from the model specified in `.scout`
   (override with `--model` if needed). Pass `--config <path>` only when the
   `.scout` file lives outside `<target>`.
@@ -31,8 +31,7 @@ PYTHONPATH.
 
 Stick to idiomatic Python 3.11: 4-space indentation, type hints, and
 single-responsibility functions that mirror the current modules. Use snake_case
-for files, functions, and CLI arguments (`--extraPrompt` stays camelCase because
-it reflects the legacy contract). Keep prompts as plain text or pretty-printed
+for files, functions, and CLI arguments. Keep prompts as plain text or pretty-printed
 JSON; name new templates descriptively (for example,
 `prompts/reentrancy_checklist.json`). Run `python -m compileall scout_ai_poc` or
 a formatter such as `ruff format` before committing if you introduce new
