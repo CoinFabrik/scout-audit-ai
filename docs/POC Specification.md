@@ -44,3 +44,8 @@ High level description about a Proof-of-concept which implements a selected appr
 * Dependency discovery is Rust-focused and local-file-only; generated code or external crates are out of scope.  
 * A single environment-wide `API_KEY` is assumed per run; per-provider or per-project credentials are not yet modeled.
 
+# Initial Set of Test Contracts
+
+* We used Blend Protocol to do an initial test for the POC. Blend is a universal liquidity protocol primitive that enables the permissionless creation of lending pools.
+* Repo is located here: https://github.com/code-423n4/2025-02-blend
+* The full list of smart contract analyzed has 27099 LOCs.
