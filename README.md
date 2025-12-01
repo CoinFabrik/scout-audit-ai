@@ -34,7 +34,7 @@ Usage mirrors the requested interface:
 
 The CLI automatically looks for a file named `.scout` inside the target directory. Pass `--config <path>` only when you need to point discovery at a different directory (or at an explicit `.scout` file).
 
-Pass `--include-deps` to inspect each listed Rust file for local `mod foo;` declarations and any `use` paths (e.g., `use crate::foo::bar`) so that referenced modules are automatically added to the prompt. Control recursion with `--dependency-depth` (default `1`), which is ignored unless dependencies are enabled. Installing `tree_sitter` and `tree_sitter_languages` (added to `requirements.txt`) is required for this flag.
+Pass `--include-deps` to inspect each listed Rust file for local `mod foo;` declarations and any `use` paths (e.g., `use crate::foo::bar`) so that referenced modules are automatically added to the prompt. Control recursion with `--dependency-depth` (default `1`), which is ignored unless dependencies are enabled. Installing `tree_sitter` and `tree_sitter_rust` is required for this flag.
 Remove `--dry-run` and set `API_KEY` once you are ready to hit your provider. The CLI automatically infers which backend to call based on the model string defined in `.scout` (override it per-run via `--model`). Supported models are enumerated inside `scout_ai_poc/llm_config.py`—if you pass an unknown model, the CLI will tell you which options are available per provider.
 
 For a richer dependency graph demo, run the complex example:
