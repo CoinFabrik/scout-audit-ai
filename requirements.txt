@@ -1,7 +1,7 @@
 langchain_core==1.0.7
-langchain-anthropic==1.0.0
+langchain-anthropic==1.2.0
 langchain-google-genai==3.0.0
-langchain-openai==1.0.1
-python-dotenv==1.0.1
-tree_sitter==0.20.1
+langchain-openai==1.0.3
+python-dotenv==1.1.1
+tree_sitter==0.25.2
 tree_sitter_rust==0.24.0
