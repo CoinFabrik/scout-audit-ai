@@ -26,10 +26,13 @@
         default = pkgs.mkShell {
           packages = with pkgs; [
             python313
-            python313Packages.langchain
+            python313Packages.langchain-core
             python313Packages.langchain-openai
             python313Packages.langchain-anthropic
             python313Packages.langchain-google-genai
+            python313Packages.python-dotenv
+            python313Packages.tree-sitter
+            python313Packages.tree-sitter-rust
           ];
         };
       }
