@@ -4,4 +4,4 @@ langchain-google-genai==3.0.0
 langchain-openai==1.0.1
 python-dotenv==1.0.1
 tree_sitter==0.20.1
-tree_sitter_languages==1.10.2
+tree_sitter_rust==0.24.0

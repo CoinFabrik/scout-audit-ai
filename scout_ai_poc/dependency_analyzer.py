@@ -6,13 +6,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Sequence, Set, Tuple
 
-from tree_sitter import Node, Parser
-from tree_sitter_languages import get_language
+from tree_sitter import Node, Parser, Language
+import tree_sitter_rust as tsrust
 
 logger = logging.getLogger(__name__)
 
-_PARSER = Parser()
-_PARSER.set_language(get_language("rust"))
+_PARSER = Parser(Language(tsrust.language()))
 
 
 @dataclass
