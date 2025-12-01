@@ -28,7 +28,7 @@ Usage mirrors the requested interface:
 
 ```bash
 ./scout-ai-poc examples \
-  --extraPrompt ./prompts/input_validation.json \
+  --extra-prompt ./prompts/input_validation.json \
   --dry-run
 ```
 
@@ -54,7 +54,7 @@ For a richer dependency graph demo, run the complex example:
 - `scout_ai_poc/runner.py` – orchestrates vulnerability catalog lookups and LangChain execution.
 - `scout_ai_poc/vulnerability_catalog.py` – curated vulnerabilities per contract type.
 - `prompts/base_prompt.txt` – primary template; edit this file to adjust model instructions.
-- `prompts/input_validation.json` – example extra prompt payload wired via `--extraPrompt`.
+- `prompts/input_validation.json` – example extra prompt payload wired via `--extra-prompt`.
 - `examples/.scout` – demo configuration pointing at `contracts/swap.rs`.
 - `examples/complex/.scout` – dependency-heavy sample centered on `contracts/gateway.rs`.
 - `scout-ai-poc` – thin wrapper so you can run `scout-ai-poc …` locally.
@@ -66,7 +66,7 @@ Each project keeps a single file literally named `.scout`, located at the direct
 ```json
 {
   "contract_type": "dex",
-  "model": "gpt-5.1-mini",
+  "model": "gpt-5.1",
   "files": ["relative/or/absolute/path/to/file.rs"]
 }
 ```
@@ -79,7 +79,7 @@ Each supported model has an explicit deterministic preset in `scout_ai_poc/llm_c
 
 ## Extra prompt inputs
 
-`--extraPrompt` accepts any text file. If the file extension is `.json`, the CLI pretty-prints its contents before stitching it into the template, which makes it easy to keep structured checklists such as `prompts/input_validation.json`.
+`--extra-prompt` accepts any text file. If the file extension is `.json`, the CLI pretty-prints its contents before stitching it into the template, which makes it easy to keep structured checklists such as `prompts/input_validation.json`.
 
 ## Running against real models
 
