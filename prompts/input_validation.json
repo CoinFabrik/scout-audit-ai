@@ -3,6 +3,7 @@
   "checks": [
     "Look for unchecked arithmetic when converting token amounts.",
     "Ensure every external instruction validates signer permissions.",
-    "Verify cross-program invocations sanitize accounts provided by callers."
+    "Verify cross-program invocations sanitize accounts provided by callers.",
+    "If one parameter is an array, the program may need to validate there are no duplicated elements."
   ]
 }
