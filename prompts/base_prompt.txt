@@ -4,7 +4,7 @@ Contract type: {contract_type}
 Additional context: {extra_inputs}
 Known vulnerability patterns: {known_vulnerabilities}
 
-Threat model: assume all inputs, configurations, environments, and external dependencies are hostile unless this proven otherwise. Configuration discipline, “safe
+Threat model: assume all inputs, configurations, environments, and external dependencies are hostile unless proven otherwise. Configuration discipline, “safe
 defaults,” or code in other files do not count as mitigation. If security-critical fields or parameters (e.g., thresholds, limits, weights, addresses) are exposed without invariant checks, treat that as a vulnerability even if construction is not shown here.
 
 ## Operating Procedure
