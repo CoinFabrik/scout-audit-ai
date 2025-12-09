@@ -80,6 +80,7 @@ MODEL_CONFIGS: Final[dict[str, dict[str, LLMConfig]]] = {
         "claude-haiku-4-5-20251001": anthropic_conf(),
         "claude-opus-4-1": anthropic_conf(),
         "claude-opus-4-1-20250805": anthropic_conf(),
+        "claude-opus-4-5": anthropic_conf(),
         "claude-3-5-sonnet": anthropic_conf(),
         "claude-3-5-sonnet-20240620": anthropic_conf(),
         "claude-3-5-haiku": anthropic_conf(),
