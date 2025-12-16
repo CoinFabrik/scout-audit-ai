@@ -19,7 +19,7 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
         "--config",
         "-c",
         help=(
-            "Path to a directory or file used to locate the canonical '.scout' "
+            "Path to a directory or file used to locate the canonical 'scout.json' "
             "(default: search within the target directory)."
         ),
     )
@@ -31,7 +31,7 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--model",
         default=None,
-        help="Override the model defined in the '.scout' config for this run.",
+        help="Override the model defined in the 'scout.json' config for this run.",
     )
     parser.add_argument(
         "--dry-run",
