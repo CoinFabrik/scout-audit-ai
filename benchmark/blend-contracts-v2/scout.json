@@ -1,0 +1,8 @@
+{
+  "contract_type": "lending",
+  "model": "claude-sonnet-4-5",
+  "files": [
+    "./pool/src/pool/pool.rs",
+    "./pool/src/pool/submit.rs"
+  ]
+}
