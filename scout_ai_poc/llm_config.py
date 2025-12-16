@@ -58,6 +58,8 @@ def gemini_conf(**overrides: Any) -> LLMConfig:
 
 MODEL_CONFIGS: Final[dict[str, dict[str, LLMConfig]]] = {
     "openai": {
+        "gpt-5.2": openai_conf(reasoning=True),
+        "gpt-5.2-2025-12-11": openai_conf(reasoning=True),
         "gpt-5.1": openai_conf(reasoning=True),
         "gpt-5.1-2025-11-13": openai_conf(reasoning=True),
         "gpt-5": openai_conf(reasoning=True),
