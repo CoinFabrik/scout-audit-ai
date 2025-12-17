@@ -1,0 +1,7 @@
+{
+  "contract_type": "lending",
+  "model": "claude-sonnet-4-5",
+  "files": [
+    "./contracts/gateway.rs"
+  ]
+}

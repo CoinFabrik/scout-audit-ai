@@ -25,7 +25,7 @@ from .paths import DEFAULT_PROMPT_PATH
 from .providers import infer_provider
 from .vulnerability_catalog import get_vulnerabilities
 
-CONFIG_FILENAME = ".scout"
+CONFIG_FILENAME = "scout.json"
 logger = logging.getLogger(__name__)
 
 
@@ -143,7 +143,7 @@ def run_analysis(args) -> int:
         )
         return 1
 
-    model_source = "CLI flag" if args.model else ".scout config"
+    model_source = "CLI flag" if args.model else "scout.json config"
     logger.info("Using model '%s' from %s.", model_name, model_source)
     try:
         provider, provider_config = infer_provider(model_name)

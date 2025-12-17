@@ -3,12 +3,12 @@
 ## Project Structure & Module Organization
 
 The CLI logic lives inside `scout_ai_poc/`: `cli.py` handles argument parsing,
-`data_loader.py` ingests `.scout` configs plus prompt files, `runner.py`
+`data_loader.py` ingests `scout.json` configs plus prompt files, `runner.py`
 stitches vulnerability catalogs into the final payload, and `main.py` wires
 everything together. `prompts/` stores reusable template fragments (edit
 `base_prompt.md` to shift tone, and drop JSON snippets that can be referenced
 with `--extra-prompt`). Use `examples/` for contract fixtures such as
-`contracts/swap.rs`; the canonical config there is `examples/.scout`. The
+`contracts/swap.rs`; the canonical config there is `examples/scout.json`. The
 root-level `scout-ai-poc` Bash shim simply forwards to
 `python3 -m scout_ai_poc.main`, allowing you to invoke the tool without touching
 PYTHONPATH.
@@ -19,13 +19,13 @@ PYTHONPATH.
   environment.
 - `pip install -r requirements.txt` — sync LangChain + OpenAI/Anthropic
   dependencies.
-- `./scout-ai-poc examples --dry-run` — autodetects `examples/.scout` and
+- `./scout-ai-poc examples --dry-run` — autodetects `examples/scout.json` and
   renders the composed prompt without calling an LLM; ideal for debugging
   configs.
 - `API_KEY=... ./scout-ai-poc <target> --extra-prompt prompts/input_validation.json`
   — run end-to-end; the provider is inferred from the model specified in
-  `.scout` (override with `--model` if needed). Pass `--config <path>` only when
-  the `.scout` file lives outside `<target>`.
+  `scout.json` (override with `--model` if needed). Pass `--config <path>` only
+  when the `scout.json` file lives outside `<target>`.
 
 ## Coding Style & Naming Conventions
 
@@ -43,24 +43,25 @@ There is no automated suite yet, so prefer adding targeted `pytest` cases under
 a new `tests/` directory, mirroring module names (e.g.,
 `tests/test_data_loader.py`). Name tests after the behavior under scrutiny
 (`test_merges_extra_prompt_when_json`). For manual validation, rely on
-`--dry-run` plus small `.scout` fixtures inside `examples/`. Treat regression
-scenarios by diffing the rendered prompt output; aim for high coverage on
-catalog expansion and file path resolution logic since those affect every run.
+`--dry-run` plus small `scout.json` fixtures inside `examples/`. Treat
+regression scenarios by diffing the rendered prompt output; aim for high
+coverage on catalog expansion and file path resolution logic since those affect
+every run.
 
 ## Commit & Pull Request Guidelines
 
 Follow a concise, present-tense style such as `feat: add wasm target catalog` or
 `fix: guard missing prompt`. Each PR should describe the motivation, list the
-CLI commands you used for verification, and reference related `.scout` samples
-or issues. Include screenshots of prompt diffs only when they clarify behavior
-changes. Keep changes scoped (CLI parsing, runner behavior, or catalog data) so
-reviewers can quickly reason about risk.
+CLI commands you used for verification, and reference related `scout.json`
+samples or issues. Include screenshots of prompt diffs only when they clarify
+behavior changes. Keep changes scoped (CLI parsing, runner behavior, or catalog
+data) so reviewers can quickly reason about risk.
 
 ## Security & Configuration Tips
 
-Never commit real `API_KEY` values or production `.scout` files—treat them as
-secrets and load through environment variables. Validate `.scout` inputs before
-running remote analyses, especially if contract sources come from untrusted
-repositories. When sharing prompt snippets, scrub customer-identifying details
-and keep the minimal set of files required to reproduce the vulnerability
-context.
+Never commit real `API_KEY` values or production `scout.json` files—treat them
+as secrets and load through environment variables. Validate `scout.json` inputs
+before running remote analyses, especially if contract sources come from
+untrusted repositories. When sharing prompt snippets, scrub customer-identifying
+details and keep the minimal set of files required to reproduce the
+vulnerability context.

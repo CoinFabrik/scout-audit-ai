@@ -1,9 +1,9 @@
 # scout-ai-poc
 
 Proof-of-concept CLI that wires a LangChain prompt around Rust smart contract
-files. The tool reads a `.scout` configuration, enriches it with a per-contract
-vulnerability catalog, merges any extra prompt snippets, and prepares a final
-request for an LLM.
+files. The tool reads a `scout.json` configuration, enriches it with a
+per-contract vulnerability catalog, merges any extra prompt snippets, and
+prepares a final request for an LLM.
 
 ## Quickstart
 
@@ -37,9 +37,9 @@ Usage mirrors the requested interface:
   --dry-run
 ```
 
-The CLI automatically looks for a file named `.scout` inside the target
+The CLI automatically looks for a file named `scout.json` inside the target
 directory. Pass `--config <path>` only when you need to point discovery at a
-different directory (or at an explicit `.scout` file).
+different directory (or at an explicit `scout.json` file).
 
 Pass `--include-deps` to inspect each listed Rust file for local `mod foo;`
 declarations and any `use` paths (e.g., `use crate::foo::bar`) so that
@@ -48,9 +48,9 @@ referenced modules are automatically added to the prompt. Control recursion with
 enabled. Installing `tree_sitter` and `tree_sitter_rust` is required for this
 flag. Remove `--dry-run` and set `API_KEY` once you are ready to hit your
 provider. The CLI automatically infers which backend to call based on the model
-string defined in `.scout` (override it per-run via `--model`). Supported models
-are enumerated inside `scout_ai_poc/llm_config.py`—if you pass an unknown model,
-the CLI will tell you which options are available per provider.
+string defined in `scout.json` (override it per-run via `--model`). Supported
+models are enumerated inside `scout_ai_poc/llm_config.py`—if you pass an unknown
+model, the CLI will tell you which options are available per provider.
 
 For a richer dependency graph demo, run the complex example:
 
@@ -71,18 +71,18 @@ For a richer dependency graph demo, run the complex example:
   LangChain execution.
 - `scout_ai_poc/vulnerability_catalog.py` – curated vulnerabilities per contract
   type.
-- `prompts/base_prompt.md` – primary template; edit this file to adjust model
+- `prompts/base_prompt.txt` – primary template; edit this file to adjust model
   instructions.
 - `prompts/input_validation.json` – example extra prompt payload wired via
   `--extra-prompt`.
-- `examples/.scout` – demo configuration pointing at `contracts/swap.rs`.
-- `examples/complex/.scout` – dependency-heavy sample centered on
+- `examples/scout.json` – demo configuration pointing at `contracts/swap.rs`.
+- `examples/complex/scout.json` – dependency-heavy sample centered on
   `contracts/gateway.rs`.
 - `scout-ai-poc` – thin wrapper so you can run `scout-ai-poc …` locally.
 
-## .scout file format
+## scout.json file format
 
-Each project keeps a single file literally named `.scout`, located at the
+Each project keeps a single file literally named `scout.json`, located at the
 directory passed as `target` (or the directory supplied via `--config`). The
 file is a plain JSON document with the following minimal schema:
 
@@ -119,8 +119,8 @@ makes it easy to keep structured checklists such as
 
 1. Define `API_KEY` (via `.env` or `export API_KEY=...`).
 2. Drop the `--dry-run` flag.
-3. Ensure your `.scout` file specifies the desired `model` (or pass `--model` to
-   override it).
+3. Ensure your `scout.json` file specifies the desired `model` (or pass
+   `--model` to override it).
 4. Execute the CLI; LangChain's runnable pipeline (`prompt | llm | parser`) will
    render the template and send it to the inferred provider.
 

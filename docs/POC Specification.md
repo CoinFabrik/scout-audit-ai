@@ -15,7 +15,7 @@ High level description about a Proof-of-concept which implements a selected appr
 # High-Level Architecture
 
 * CLI wrapper: `scout-ai-poc` shell script forwards into the Python entrypoint (`scout_ai_poc/main.py`) and its CLI parser.  
-* Config intake: reads a `.scout` JSON file under the target directory (or via `--config`), plus optional `--model` override and `--extra-prompt` snippet.  
+* Config intake: reads a `scout.json` JSON file under the target directory (or via `--config`), plus optional `--model` override and `--extra-prompt` snippet.  
 * Prompt assembly: merges the base template, catalog entries for the declared `contract_type`, optional extra prompt text/JSON, and the contents of the listed files. File content is inlined so the LLM has full context.  
 * Optional dependency expansion: when `--include-deps` is set, a Rust-aware dependency walker pulls local modules into the file list up to the requested depth.  
 * Provider dispatch: the declared model maps to a provider preset; if an `API_KEY` is present and not in `--dry-run`, the LangChain pipeline calls the chosen backend, otherwise it prints the composed prompt for inspection.
@@ -26,7 +26,7 @@ High level description about a Proof-of-concept which implements a selected appr
 * Invoke anywhere: `./scout-ai-poc examples --dry-run` prints the composed prompt without calling an LLM.  
 * Bring your own extras: `./scout-ai-poc examples --dry-run --extra-prompt ./prompts/input_validation.json` to stitch in custom checks.  
 * Add context automatically for multi-module Rust projects: `./scout-ai-poc examples/complex --dry-run --include-deps --dependency-depth 2`  
-* Define `API_KEY=...` for live calls; drop `--dry-run` when ready. Model names in `.scout` (or `--model`) pick the provider; unsupported names are rejected with clear guidance.
+* Define `API_KEY=...` for live calls; drop `--dry-run` when ready. Model names in `scout.json` (or `--model`) pick the provider; unsupported names are rejected with clear guidance.
 
 # Strengths
 

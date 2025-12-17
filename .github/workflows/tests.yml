@@ -48,4 +48,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Scout dry run
-        run: ./scout-ai-poc examples --dry-run
+        run: ./scout-ai-poc examples/basic --dry-run
