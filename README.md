@@ -33,7 +33,7 @@ Usage mirrors the requested interface:
 
 ```bash
 ./scout-ai-poc examples \
-  --extra-prompt ./prompts/input_validation.json \
+  --extra-prompt ./prompts/input_validation.txt \
   --dry-run
 ```
 
@@ -110,10 +110,9 @@ errors from unsupported parameters are avoided.
 
 ## Extra prompt inputs
 
-`--extra-prompt` accepts any text file. If the file extension is `.json`, the
-CLI pretty-prints its contents before stitching it into the template, which
-makes it easy to keep structured checklists such as
-`prompts/input_validation.json`.
+`--extra-prompt` accepts a plain `.txt` file only (no JSON or inline strings).
+Drop reusable notes in a file such as `prompts/input_validation.txt` and pass
+that path via `--extra-prompt`.
 
 ## Running against real models
 
