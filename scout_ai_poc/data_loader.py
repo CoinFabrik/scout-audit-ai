@@ -58,13 +58,13 @@ def load_extra_inputs(path: Path | None) -> str:
         raise ValueError(f"Extra prompt path must be a file, got directory: {path}")
     if path.suffix.lower() != ".txt":
         raise ValueError(
-            f"Extra prompt must be a .txt file; unsupported extension: {candidate_path}"
+            f"Extra prompt must be a .txt file; unsupported extension: {path}"
         )
 
-    logger.info("Loading extra prompt from %s", candidate_path)
-    raw = candidate_path.read_text().strip()
+    logger.info("Loading extra prompt from %s", path)
+    raw = path.read_text().strip()
     if not raw:
-        logger.warning("Extra prompt file %s is empty.", candidate_path)
+        logger.warning("Extra prompt file %s is empty.", path)
         return "Extra prompt file is empty."
 
     return raw
