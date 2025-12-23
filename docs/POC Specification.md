@@ -73,6 +73,8 @@ The tool is invoked via the `scout-ai-poc` shell script, which forwards commands
 
 # Architecture & Mechanics
 
+{ Cristian: Add Arquitecture Diagram and list each module and their function below }
+
 ## CLI & Configuration
 
 The CLI wrapper reads inputs from `scout.json`, the command line arguments, and the environment (`API_KEY`). It determines the execution flow based on the presence of the `--dry-run` flag.
@@ -101,6 +103,8 @@ When `--include-deps` is set, the tool performs a local dependency scan:
 1.  **Parsing:** Uses `tree_sitter` to scan listed files for `mod foo;` (declarations without bodies) and `use` paths (crate/self/super, scoped, glob).
 2.  **Resolution:** Resolves modules to `foo.rs` or `foo/mod.rs`.
 3.  **Traversal:** Performs a Breadth-First Search (BFS) with deduplication, limited to the target root and the specified `--dependency-depth` (default: 1).
+
+{ Cristian: Add Directory Structure with descriptions to easily understand it }
 
 ## Models & Providers
 
