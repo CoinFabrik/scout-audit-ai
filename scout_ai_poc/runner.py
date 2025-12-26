@@ -13,7 +13,6 @@ from langchain_core.prompts import (
     SystemMessagePromptTemplate,
 )
 
-
 from .data_loader import (
     build_files_context,
     load_config,
@@ -21,6 +20,8 @@ from .data_loader import (
     read_prompt_file,
 )
 from .dependency_analyzer import include_dependencies
+from .llm_config import LLMConfig
+from .llm_modes import DEFAULT_LLM_MODE, LLM_MODE_CREATIVE
 from .paths import DEFAULT_PROMPT_PATH
 from .providers import infer_provider
 from .vulnerability_catalog import get_vulnerabilities
@@ -134,6 +135,8 @@ def run_analysis(args) -> int:
     config_path = resolve_config_path(target_root, args.config)
     config = load_config(config_path)
     prompt_text = read_prompt_file(DEFAULT_PROMPT_PATH)
+    llm_mode = args.llm_mode or config.get("mode") or DEFAULT_LLM_MODE
+    logger.info("Using LLM mode '%s'.", llm_mode)
 
     model_name = args.model or config.get("model")
     if not model_name:
@@ -151,6 +154,9 @@ def run_analysis(args) -> int:
         logger.error("%s", exc)
         return 1
     logger.info("Inferred provider '%s' for model '%s'.", provider.name, model_name)
+    if llm_mode == LLM_MODE_CREATIVE:
+        logger.info("Creative mode enabled; skipping provider config overrides.")
+        provider_config = LLMConfig()
 
     file_list = config["files"]
     if args.include_deps:
