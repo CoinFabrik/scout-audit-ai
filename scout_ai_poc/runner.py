@@ -1,13 +1,10 @@
-from __future__ import annotations
-
 import logging
 import os
 import sys
 from pathlib import Path
 from typing import Dict, Iterable
-
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import (
+from langchain_core.output_parsers.string import StrOutputParser
+from langchain_core.prompts.chat import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
