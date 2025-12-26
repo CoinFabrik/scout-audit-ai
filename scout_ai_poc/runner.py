@@ -152,7 +152,6 @@ def run_analysis(args) -> int:
         return 1
     logger.info("Inferred provider '%s' for model '%s'.", provider.name, model_name)
 
-    extra_prompt_path = Path(args.extra_prompt) if args.extra_prompt else None
     file_list = config["files"]
     if args.include_deps:
         if args.dependency_depth < 1:
@@ -168,7 +167,7 @@ def run_analysis(args) -> int:
         config["contract_type"],
         file_list,
         target_root,
-        extra_prompt_path,
+        args.extra_prompt,
     )
     prompt = build_prompt(prompt_text)
 

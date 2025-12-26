@@ -47,24 +47,25 @@ def read_prompt_file(path: Path) -> str:
 
 def load_extra_inputs(path: Path | None) -> str:
     if path is None:
-        logger.info("No extra prompt file provided.")
+        logger.info("No extra prompt provided.")
         return "None provided."
+
     if not path.exists():
-        raise FileNotFoundError(f"Extra prompt file not found: {path}")
+        raise FileNotFoundError(
+            f"Extra prompt file not found: {path}. Provide a .txt file."
+        )
+    if path.is_dir():
+        raise ValueError(f"Extra prompt path must be a file, got directory: {path}")
+    if path.suffix.lower() != ".txt":
+        raise ValueError(
+            f"Extra prompt must be a .txt file; unsupported extension: {path}"
+        )
 
     logger.info("Loading extra prompt from %s", path)
     raw = path.read_text().strip()
     if not raw:
         logger.warning("Extra prompt file %s is empty.", path)
         return "Extra prompt file is empty."
-
-    if path.suffix.lower() == ".json":
-        try:
-            parsed = json.loads(raw)
-        except json.JSONDecodeError:
-            logger.warning("Failed to parse %s as JSON; returning raw contents.", path)
-            return raw
-        return json.dumps(parsed, indent=2)
 
     return raw
 
