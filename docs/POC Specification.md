@@ -84,7 +84,13 @@ The tool is invoked via the `scout-ai-poc` shell script, which forwards commands
 
 # Architecture & Mechanics
 
-{ Cristian: Add Arquitecture Diagram and list each module and their function below }
+![scout-ai-poc architecture](architecture.png)
+
+## Module Map
+
+- Dependency Analyzer: Expands the file list by resolving local Rust `mod`/`use` paths with BFS and configurable depth.
+- Vulnerability RAG: Retrieves the vulnerability catalog by `contract_type` to enrich the prompt.
+- LLM: Executes the composed prompt and returns the vulnerability list.
 
 ## CLI & Configuration
 
