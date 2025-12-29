@@ -60,9 +60,10 @@ prompt-structuring tool rather than a fine-tuned model.
 
 In response to our research findings, we delivered **Scout AI**, a lightweight
 CLI wrapper designed to help Soroban smart-contract reviewers assemble
-structured audit prompts. The tool operates on the philosophy of minimizing
-"surprise behavior" by enforcing reproducible, deterministic-leaning model
-presets.
+structured audit prompts. The tool supports two distinct operational modes that
+fundamentally alter the LLM's generation parameters to suit different audit
+stages: One optimized for consistency (“Deterministic”) and one for deep
+exploration (“Creative”).
 
 ### Checklist-Driven Context Assembly
 
