@@ -90,23 +90,29 @@ file is a plain JSON document with the following minimal schema:
 {
   "contract_type": "dex",
   "model": "gpt-5.1",
+  "mode": "consistent",
   "files": ["relative/or/absolute/path/to/file.rs"]
 }
 ```
 
 `contract_type` selects the vulnerability catalog. `model` controls which LLM to
-use (and implicitly which provider is invoked). `files` entries are resolved
-relative to `target` and inlined into the prompt in the order provided.
+use (and implicitly which provider is invoked). `mode` selects how model
+parameters are handled (`consistent` sends the preset configuration from
+`scout_ai_poc/llm_config.py`, while `creative` sends no overrides so the
+provider defaults apply). `files` entries are resolved relative to `target` and
+inlined into the prompt in the order provided.
 
-### Deterministic LLM configuration
+### Consistent LLM configuration
 
-Each supported model has an explicit deterministic preset in
+Each supported model has an explicit consistent preset in
 `scout_ai_poc/llm_config.py`. We start from a shared base (temperature `0.0`,
 fixed `seed`, zero penalties) and then specialize by provider/model—for example,
 Gemini forces `top_p=0`/`top_k=1`, while `gpt-5.1` drops `temperature` entirely
 because that endpoint rejects it and instead receives only the
 `reasoning_effort` hint. The adapter only forwards knobs the backend accepts so
-errors from unsupported parameters are avoided.
+errors from unsupported parameters are avoided. Set `mode` to `creative` in
+`scout.json` or pass `--llm-mode creative` to skip all overrides and use
+provider defaults.
 
 ## Extra prompt inputs
 

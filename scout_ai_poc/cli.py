@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse
 from typing import List
 
+from .llm_modes import LLM_MODES
+
 
 def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -32,6 +34,16 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
         "--model",
         default=None,
         help="Override the model defined in the 'scout.json' config for this run.",
+    )
+    parser.add_argument(
+        "--llm-mode",
+        choices=LLM_MODES,
+        type=str.lower,
+        default=None,
+        help=(
+            "LLM configuration mode (consistent or creative). Overrides the "
+            "'mode' in scout.json when provided."
+        ),
     )
     parser.add_argument(
         "--dry-run",
