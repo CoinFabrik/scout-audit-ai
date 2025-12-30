@@ -62,7 +62,7 @@ In response to our research findings, we delivered **Scout AI**, a lightweight
 CLI wrapper designed to help Soroban smart-contract reviewers assemble
 structured audit prompts. The tool supports two distinct operational modes that
 fundamentally alter the LLM's generation parameters to suit different audit
-stages: One optimized for consistency (“Deterministic”) and one for deep
+stages: One optimized for stable answers (“Consistent”) and one for deep
 exploration (“Creative”).
 
 ### Checklist-Driven Context Assembly
@@ -141,4 +141,3 @@ saturation. We plan to evaluate an advanced architecture leveraging multi-agent
 workflows and chained API calls. This architectural evolution is intended to
 solve the noise issue by intelligently narrowing the scope of analysis before
 the final vulnerability assessment takes place.
-
