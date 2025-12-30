@@ -5,6 +5,7 @@ from typing import List
 
 from .llm_modes import LLM_MODES
 
+
 def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="scout-ai-poc",
@@ -40,7 +41,7 @@ def parse_args(argv: List[str] | None = None) -> argparse.Namespace:
         type=str.lower,
         default=None,
         help=(
-            "LLM configuration mode (deterministic or creative). Overrides the "
+            "LLM configuration mode (consistent or creative). Overrides the "
             "'mode' in scout.json when provided."
         ),
     )

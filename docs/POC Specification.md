@@ -11,7 +11,7 @@ Specifies the Scout AI Proof-of-Concept developed for vulnerability detection in
 This Proof-of-Concept (PoC) implements a selected approach to add AI for vulnerability detection within the Scout security bug detection tool. Its primary goals are to:
 
 - **Assist Auditors:** Help Rust smart-contract reviewers quickly assemble a structured audit prompt for an LLM.
-- **Configurable Modes:** Support deterministic or creative execution modes to control model behavior.
+- **Configurable Modes:** Support consistent or creative execution modes to control model behavior.
 - **Maintain Simplicity:** Stay lightweight so teams can inspect or extend prompts without deep framework knowledge.
 
 # Usage Guide
@@ -52,7 +52,7 @@ The tool is invoked via the `scout-ai-poc` shell script, which forwards commands
   ```bash
   ./scout-ai-poc <target> --model <name>
   ```
-- **Declare Mode:** Choose deterministic (preset parameters) or creative (no overrides) via `scout.json` or CLI.
+- **Declare Mode:** Choose consistent (preset parameters) or creative (no overrides) via `scout.json` or CLI.
   - `scout.json` example:
     ```json
     { "mode": "creative" }
@@ -130,11 +130,11 @@ When `--include-deps` is set, the tool performs a local dependency scan:
   - **OpenAI:** GPT-5.x and 4.1 variants.
   - **Anthropic:** Claude 4.x and 3.5.
   - **Gemini:** 2.5 and 3 preview.
-- **Behavior:** Modes can be declared to either apply deterministic presets (temperature 0, seeded configs) or skip all overrides for creative runs. The `API_KEY` environment variable is used regardless of provider.
+- **Behavior:** Modes can be declared to either apply consistent presets (temperature 0, seeded configs) or skip all overrides for creative runs. The `API_KEY` environment variable is used regardless of provider.
 
 # Strengths
 
-- **Configurable Modes:** Choose deterministic presets for tighter control or creative defaults for exploration.
+- **Configurable Modes:** Choose consistent presets for tighter control or creative defaults for exploration.
 - **Cost Efficiency:** Dry-run mode allows full review of the prompt before spending tokens.
 - **Context Aware:** Catalog-driven context keeps findings relevant to the specific contract type.
 - **Reduced Blind Spots:** Optional dependency scanning helps catch issues in linked modules.
@@ -146,5 +146,5 @@ When `--include-deps` is set, the tool performs a local dependency scan:
   - Dependency scanning is **local-only**; external crates or generated code are not retrieved.
   - No output truncation; large files are inlined as-is.
 - **Inherent Limitations:**
-- **Probabilistic Nature:** LLM outputs may vary across runs; deterministic mode may reduce variance but does not eliminate it.
+- **Probabilistic Nature:** LLM outputs may vary across runs; consistent mode may reduce variance but does not eliminate it.
   - **Catalog Gaps:** Predefined catalogs may not cover every unique threat model; custom prompts are often necessary.

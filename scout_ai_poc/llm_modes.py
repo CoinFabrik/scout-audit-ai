@@ -1,9 +1,9 @@
 from typing import Final
 
-LLM_MODE_DETERMINISTIC: Final[str] = "deterministic"
+LLM_MODE_CONSISTENT: Final[str] = "consistent"
 LLM_MODE_CREATIVE: Final[str] = "creative"
-LLM_MODES: Final[tuple[str, ...]] = (LLM_MODE_DETERMINISTIC, LLM_MODE_CREATIVE)
-DEFAULT_LLM_MODE: Final[str] = LLM_MODE_DETERMINISTIC
+LLM_MODES: Final[tuple[str, ...]] = (LLM_MODE_CONSISTENT, LLM_MODE_CREATIVE)
+DEFAULT_LLM_MODE: Final[str] = LLM_MODE_CONSISTENT
 
 
 def normalize_llm_mode(mode: str | None) -> str | None:
