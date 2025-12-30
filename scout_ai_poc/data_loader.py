@@ -5,6 +5,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
+from .llm_modes import normalize_llm_mode
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,6 +23,7 @@ def load_config(path: Path) -> Dict[str, Any]:
     contract_type = data.get("contract_type")
     files = data.get("files", [])
     model = data.get("model")
+    mode = data.get("mode")
 
     if not contract_type:
         raise ValueError("config file must include 'contract_type'")
@@ -28,13 +31,17 @@ def load_config(path: Path) -> Dict[str, Any]:
         raise ValueError("'files' must be a list of paths")
     if model is not None and not isinstance(model, str):
         raise ValueError("'model' must be a string when provided")
+    if mode is not None and not isinstance(mode, str):
+        raise ValueError("'mode' must be a string when provided")
 
     normalized_files = [str(item) for item in files]
+    normalized_mode = normalize_llm_mode(mode) if mode is not None else None
 
     return {
         "contract_type": contract_type,
         "files": normalized_files,
         "model": model,
+        "mode": normalized_mode,
     }
 
 
