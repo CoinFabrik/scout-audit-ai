@@ -1,6 +1,10 @@
-# 2025-Q4 Grant Report
+# 2025-Q4 Grant Results Report
 
-## Scout AI & Vulnerability Detection Research
+## 30-Dec-25
+
+## Purpose of this document
+
+This document summarizes our main activities and results under the SCF 2025 Q4 Public Good Award Grant.
 
 ## Executive Summary
 

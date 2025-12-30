@@ -1,12 +1,12 @@
 # Scout AI Proof-of-Concept Specification
 
-## 23-Dec-25
+## 30-Dec-25
 
-# Purpose of this document
+## Purpose of this document
 
 Specifies the Scout AI Proof-of-Concept developed for vulnerability detection in the context of Scout security bug detection tool.
 
-# Purpose & Overview
+## Overview
 
 This Proof-of-Concept (PoC) implements a selected approach to add AI for vulnerability detection within the Scout security bug detection tool. Its primary goals are to:
 
@@ -14,9 +14,9 @@ This Proof-of-Concept (PoC) implements a selected approach to add AI for vulnera
 - **Configurable Modes:** Support consistent or creative execution modes to control model behavior.
 - **Maintain Simplicity:** Stay lightweight so teams can inspect or extend prompts without deep framework knowledge.
 
-# Usage Guide
+## Usage Guide
 
-## Installation
+### Installation
 
 Install once from source using Python 3.12+:
 
@@ -24,11 +24,11 @@ Install once from source using Python 3.12+:
 python3.12 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 ```
 
-## Running the Tool
+### Running the Tool
 
 The tool is invoked via the `scout-ai-poc` shell script, which forwards commands to the Python entry point (`scout_ai_poc/main.py`).
 
-### 1. Basic & Dry Runs
+#### 1. Basic & Dry Runs
 
 - **Dry Run (Recommended first step):** Prints the composed prompt (System + Human messages) without calling an LLM.
   ```bash
@@ -40,7 +40,7 @@ The tool is invoked via the `scout-ai-poc` shell script, which forwards commands
   ./scout-ai-poc examples
   ```
 
-### 2. Configuration & Models
+#### 2. Configuration & Models
 
 - **Targeting:** The CLI looks for a file named `scout.json` inside the target directory.
   - _Note:_ Only files literally named `scout.json` are accepted.
@@ -62,7 +62,7 @@ The tool is invoked via the `scout-ai-poc` shell script, which forwards commands
     ./scout-ai-poc <target> --llm-mode creative
     ```
 
-### 3. Advanced Context & Dependencies
+#### 3. Advanced Context & Dependencies
 
 - **Include Rust Dependencies:** Automatically scans and includes local Rust modules (uses `tree-sitter` for parsing):
   ```bash
@@ -73,7 +73,7 @@ The tool is invoked via the `scout-ai-poc` shell script, which forwards commands
   ./scout-ai-poc examples --dry-run --extra-prompt ./prompts/input_validation.txt
   ```
 
-## Understanding the Output
+### Understanding the Output
 
 - **Dry Run:** Prints the full prompt structure:
   - `[SYSTEM]`: Base audit instructions with injected variables (contract type, catalog checks).
@@ -82,21 +82,21 @@ The tool is invoked via the `scout-ai-poc` shell script, which forwards commands
 - **Live Run:** Prints the LLM response text only.
 - **Logging:** Verbosity can be controlled via `SCOUT_LOG_LEVEL` (default: INFO).
 
-# Architecture & Mechanics
+## Architecture & Mechanics
 
 ![scout-ai-poc architecture](architecture.png)
 
-## Module Map
+### Module Map
 
 - Dependency Analyzer: Expands the file list by resolving local Rust `mod`/`use` paths with BFS and configurable depth.
 - Vulnerability RAG: Retrieves the vulnerability catalog by `contract_type` to enrich the prompt.
 - LLM: Executes the composed prompt and returns the vulnerability list.
 
-## CLI & Configuration
+### CLI & Configuration
 
 The CLI wrapper reads inputs from `scout.json`, the command line arguments, and the environment (`API_KEY`). It determines the execution flow based on the presence of the `--dry-run` flag.
 
-## Prompt Assembly
+### Prompt Assembly
 
 The tool constructs a prompt by merging four key elements:
 
@@ -107,13 +107,13 @@ The tool constructs a prompt by merging four key elements:
 
 The pipeline follows a simple structure: `prompt | llm | StrOutputParser()`.
 
-## Vulnerability Catalog
+### Vulnerability Catalog
 
 - **Location:** `scout_ai_poc/vulnerability_catalog.py`
 - **Purpose:** Provides a stable, editable list of checks per `contract_type` to align findings with specific threat models.
 - **Structure:** Entries are tuples of `(description, scope)`. Scope can be generic (`{"ALL"}`) or specific (e.g., `{"lending"}`).
 
-## Dependency Inclusion (Rust-only)
+### Dependency Inclusion (Rust-only)
 
 When `--include-deps` is set, the tool performs a local dependency scan:
 
@@ -121,9 +121,7 @@ When `--include-deps` is set, the tool performs a local dependency scan:
 2.  **Resolution:** Resolves modules to `foo.rs` or `foo/mod.rs`.
 3.  **Traversal:** Performs a Breadth-First Search (BFS) with deduplication, limited to the target root and the specified `--dependency-depth` (default: 1).
 
-{ Cristian: Add Directory Structure with descriptions to easily understand it }
-
-## Models & Providers
+### Models & Providers
 
 - **Configuration:** Presets are defined in `scout_ai_poc/llm_config.py`; logic resides in `scout_ai_poc/providers.py`.
 - **Supported Families:**
@@ -132,7 +130,7 @@ When `--include-deps` is set, the tool performs a local dependency scan:
   - **Gemini:** 2.5 and 3 preview.
 - **Behavior:** Modes can be declared to either apply consistent presets (temperature 0, seeded configs) or skip all overrides for creative runs. The `API_KEY` environment variable is used regardless of provider.
 
-# Strengths
+## Strengths
 
 - **Configurable Modes:** Choose consistent presets for tighter control or creative defaults for exploration.
 - **Cost Efficiency:** Dry-run mode allows full review of the prompt before spending tokens.
@@ -140,7 +138,7 @@ When `--include-deps` is set, the tool performs a local dependency scan:
 - **Reduced Blind Spots:** Optional dependency scanning helps catch issues in linked modules.
 - **Low Barrier to Entry:** Simple file-based inputs allow easy contribution of new checks; CLI requires no Python expertise to operate.
 
-# Scope & Limitations
+## Scope & Limitations
 
 - **Scope Constraints:**
   - Dependency scanning is **local-only**; external crates or generated code are not retrieved.
